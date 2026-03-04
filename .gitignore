@@ -1,0 +1,10 @@
+bin/
+tmp/
+*.exe
+*.test
+*.out
+.env
+.envrc
+vendor/
+.DS_Store
+.idea/
