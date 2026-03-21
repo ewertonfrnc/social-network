@@ -72,6 +72,14 @@ func (app *application) getPostHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	comments, err := app.store.Comments.GetByPostID(ctx, postId)
+	if err != nil {
+		app.internalServerError(w, r, err)
+		return
+	}
+
+	post.Comments = comments
+
 	err = WriteJSON(w, http.StatusOK, post)
 	if err != nil {
 		app.internalServerError(w, r, err)
