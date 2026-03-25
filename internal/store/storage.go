@@ -11,6 +11,8 @@ var ErrNotFound = errors.New("Resource not found")
 type Storage struct {
 	Posts interface {
 		Create(context.Context, *Post) error
+		Update(context.Context, *Post) error
+		Delete(context.Context, int64) error
 		GetByID(context.Context, int64) (*Post, error)
 	}
 	Users interface {
