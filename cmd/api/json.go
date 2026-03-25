@@ -37,3 +37,11 @@ func WriteJSONError(w http.ResponseWriter, status int, message string) error {
 
 	return WriteJSON(w, status, errorResponse{Error: message})
 }
+
+func (app *application) jsonResponse(w http.ResponseWriter, status int, data any) error {
+	type Data struct {
+		Data any `json:"data"`
+	}
+
+	return WriteJSON(w, status, Data{Data: data})
+}
