@@ -18,6 +18,9 @@ type UserStore struct {
 }
 
 func (store *UserStore) Create(ctx context.Context, user *User) error {
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
 	query := `
 	INSERT INTO users (username, email, password)
 	VALUES ($1, $2, $3)
@@ -36,11 +39,9 @@ func (store *UserStore) Create(ctx context.Context, user *User) error {
 		&user.Email,
 		&user.CreatedAt,
 	)
-
 	if err != nil {
 		return err
 	}
 
 	return nil
-
 }

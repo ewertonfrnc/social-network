@@ -25,6 +25,9 @@ type PostStore struct {
 }
 
 func (store *PostStore) Create(ctx context.Context, post *Post) error {
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
 	query := `
 	INSERT INTO posts (title, content, tags, user_id)
 	VALUES ($1, $2, $3, $4)
@@ -55,6 +58,9 @@ func (store *PostStore) Create(ctx context.Context, post *Post) error {
 }
 
 func (store *PostStore) GetByID(ctx context.Context, postId int64) (*Post, error) {
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
 	query := `
 		SELECT id, title, content, tags, created_at, updated_at, user_id, version
 		FROM posts
@@ -85,6 +91,9 @@ func (store *PostStore) GetByID(ctx context.Context, postId int64) (*Post, error
 }
 
 func (store *PostStore) Delete(ctx context.Context, postId int64) error {
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
 	query := `
 	DELETE FROM posts
 	WHERE id = $1
@@ -107,6 +116,9 @@ func (store *PostStore) Delete(ctx context.Context, postId int64) error {
 }
 
 func (store *PostStore) Update(ctx context.Context, post *Post) error {
+	ctx, cancel := context.WithTimeout(ctx, QueryTimeoutDuration)
+	defer cancel()
+
 	query := `
 	UPDATE posts
 	SET title = $1, content = $2, updated_at = NOW(), version = version + 1
