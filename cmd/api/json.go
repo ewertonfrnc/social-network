@@ -32,16 +32,18 @@ func ReadJSON(w http.ResponseWriter, r *http.Request, data any) error {
 
 func WriteJSONError(w http.ResponseWriter, status int, message string) error {
 	type errorResponse struct {
-		Error string `json:"error"`
+		Success bool   `json:"success"`
+		Error   string `json:"error"`
 	}
 
-	return WriteJSON(w, status, errorResponse{Error: message})
+	return WriteJSON(w, status, errorResponse{Success: false, Error: message})
 }
 
 func (app *application) jsonResponse(w http.ResponseWriter, status int, data any) error {
 	type Data struct {
-		Data any `json:"data"`
+		Success bool `json:"success"`
+		Data    any  `json:"data"`
 	}
 
-	return WriteJSON(w, status, Data{Data: data})
+	return WriteJSON(w, status, Data{Success: true, Data: data})
 }
