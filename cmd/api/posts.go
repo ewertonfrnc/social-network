@@ -138,7 +138,6 @@ func (app *application) updatePostHandler(w http.ResponseWriter, r *http.Request
 	}
 }
 
-// [TODO] Refactor this middleware to be more generic and reusable for other resources (e.g., users, comments)
 func (app *application) postContextMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rawPostId := chi.URLParam(r, "postId")
