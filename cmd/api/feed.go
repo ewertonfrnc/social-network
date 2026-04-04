@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/ewertonfrnc/social-network/internal/store"
 )
@@ -57,6 +58,14 @@ func parsePaginatedFeedQuery(r *http.Request) (store.PaginatedFeedQuery, error) 
 
 	if sortDirection := queryString.Get("sort"); sortDirection != "" {
 		fq.SortDirection = sortDirection
+	}
+
+	if tags := queryString.Get("tags"); tags != "" {
+		fq.Tags = strings.Split(tags, ",")
+	}
+
+	if search := queryString.Get("search"); search != "" {
+		fq.Search = search
 	}
 
 	return fq, nil

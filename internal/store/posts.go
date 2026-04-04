@@ -53,13 +53,20 @@ func (store *PostStore) GetUserFeed(ctx context.Context, userID int64, fq Pagina
 		COUNT(c.id) AS comments_count
 	FROM
 		posts p
-		LEFT JOIN users u ON p.user_id = u.id
 		LEFT JOIN comments c ON c.post_id = p.id
-		LEFT JOIN followers f ON f.user_id = $1
-		AND f.follower_id = p.user_id
+		LEFT JOIN users u ON p.user_id = u.id
+		LEFT JOIN followers f ON f.follower_id = p.user_id
+		OR p.user_id = $1
 	WHERE
-		p.user_id = $1
-		OR f.user_id IS NOT NULL
+		f.user_id = $1
+		AND (
+			p.title ILIKE '%%' || $4 || '%%'
+			OR p.content ILIKE '%%' || $4 || '%%'
+		)
+		AND (
+			p.tags && $5
+			OR $5 IS NULL
+		)
 	GROUP BY
 		p.id,
 		u.username
@@ -72,14 +79,14 @@ func (store *PostStore) GetUserFeed(ctx context.Context, userID int64, fq Pagina
 		$3
 	`, sortDirection, sortDirection)
 
-	rows, err := store.db.QueryContext(ctx, query, userID, fq.Limit, fq.Offset)
+	rows, err := store.db.QueryContext(ctx, query, userID, fq.Limit, fq.Offset, fq.Search, pq.Array(fq.Tags))
 	if err != nil {
 		return nil, err
 	}
 
 	defer rows.Close()
 
-	var posts []PostWithMetadata
+	posts := []PostWithMetadata{}
 	for rows.Next() {
 		var post PostWithMetadata
 
