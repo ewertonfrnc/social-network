@@ -23,7 +23,9 @@ func main() {
 
 	// Logger
 	logger := zap.Must(zap.NewProduction()).Sugar()
-	defer logger.Sync()
+	defer func() {
+		_ = logger.Sync()
+	}()
 
 	// Database
 	db, err := db.New(
