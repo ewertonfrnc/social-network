@@ -15,6 +15,11 @@ type RegisterUserPayload struct {
 	Password string `json:"password" validate:"required,min=8,max=72"`
 }
 
+type UserWithToken struct {
+	*store.User
+	Token string `json:"token"`
+}
+
 func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Request) {
 	var payload RegisterUserPayload
 	if err := ReadJSON(w, r, &payload); err != nil {
@@ -47,10 +52,10 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 	if err != nil {
 		switch err {
 		case store.ErrDuplicateEmail:
-			app.badRequest(w, r, err)
+			app.badRequest(w, r, store.ErrDuplicateEmail)
 			return
 		case store.ErrDuplicateUsername:
-			app.badRequest(w, r, err)
+			app.badRequest(w, r, store.ErrDuplicateUsername)
 			return
 		default:
 			app.internalServerError(w, r, err)
@@ -58,7 +63,12 @@ func (app *application) registerUserHandler(w http.ResponseWriter, r *http.Reque
 		}
 	}
 
-	if err := app.jsonResponse(w, http.StatusOK, nil); err != nil {
+	userWithToken := &UserWithToken{
+		User:  user,
+		Token: plainToken,
+	}
+
+	if err := app.jsonResponse(w, http.StatusCreated, userWithToken); err != nil {
 		app.internalServerError(w, r, err)
 		return
 	}
