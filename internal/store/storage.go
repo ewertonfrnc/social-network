@@ -11,6 +11,8 @@ var (
 	ErrNotFound          = errors.New("Resource not found")
 	ErrSelfFollow        = errors.New("User cannot follow themselves")
 	ErrSelfUnfollow      = errors.New("User cannot unfollow themselves")
+	ErrDuplicateEmail    = errors.New("Email already in use")
+	ErrDuplicateUsername = errors.New("Username already in use")
 	QueryTimeoutDuration = 5 * time.Second
 )
 
@@ -23,8 +25,9 @@ type Storage struct {
 		GetUserFeed(context.Context, int64, PaginatedFeedQuery) ([]PostWithMetadata, error)
 	}
 	Users interface {
-		Create(context.Context, *User) error
+		Create(context.Context, *sql.Tx, *User) error
 		GetByID(context.Context, int64) (*User, error)
+		CreateAndInvite(ctx context.Context, user *User, token string, expiresAt time.Duration) error
 	}
 	Comments interface {
 		Create(context.Context, *Comment) error
@@ -43,4 +46,18 @@ func NewDBStorage(db *sql.DB) Storage {
 		Comments:  &CommentStore{db},
 		Followers: &FollowerStore{db},
 	}
+}
+
+func withTx(db *sql.DB, ctx context.Context, fn func(*sql.Tx) error) error {
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	if err := fn(tx); err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
 }

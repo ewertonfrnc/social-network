@@ -6,4 +6,4 @@ CREATE TABLE IF NOT EXISTS users(
     username text UNIQUE NOT NULL,
     password bytea NOT NULL,
     created_at timestamp(0) NOT NULL DEFAULT NOW()
-)
+);
