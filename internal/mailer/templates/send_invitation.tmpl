@@ -1,0 +1,17 @@
+{{define "subject"}}...{{end}}
+
+{{define "body"}}
+<!doctype html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>Invitation to Join Our Social Network</title>
+</head>
+<body>
+  <p>Hi {{.Username}},</p>
+  <p>You've been invited to join our social network! Click the link below to confirm your email address:</p>
+  <p><a href="{{.ActivationURL}}">{{.ActivationURL}}</a></p>
+</body>
+</html>
+{{end}}

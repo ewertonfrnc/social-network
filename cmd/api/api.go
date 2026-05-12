@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/ewertonfrnc/social-network/internal/mailer"
 	"github.com/ewertonfrnc/social-network/internal/store"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -14,17 +15,25 @@ type application struct {
 	config config
 	store  store.Storage
 	logger *zap.SugaredLogger
+	mailer *mailer.SendGridmailer
 }
 
 type config struct {
-	address string
-	db      dbConfig
-	env     string
-	mail    mailConfig
+	address     string
+	db          dbConfig
+	env         string
+	mail        mailConfig
+	frontendURL string
 }
 
 type mailConfig struct {
+	fromEmail string
+	sendGrid  sendgridConfig
 	expiresAt time.Duration
+}
+
+type sendgridConfig struct {
+	apiKey string
 }
 
 type dbConfig struct {
